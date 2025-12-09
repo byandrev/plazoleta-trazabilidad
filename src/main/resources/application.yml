@@ -8,7 +8,9 @@ spring:
       host: localhost
       port: 27017
       username: test
-      password: test
+      password: 202cb962ac59075b964b07152d234b70
+      authentication-database: admin
+      authentication-mechanism: SCRAM-SHA-256
 
 jwt:
   secret: 123456
