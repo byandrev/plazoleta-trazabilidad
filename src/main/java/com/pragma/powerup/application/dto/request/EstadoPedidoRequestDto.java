@@ -31,7 +31,6 @@ public class EstadoPedidoRequestDto {
     @NotNull(message = "Es necesario el empleadoId")
     private Long empleadoId;
 
-    @NotBlank(message = "El correoEmpleado no puede estar vacio")
     @Email(message = "El correo del empleado es inválido")
     private String correoEmpleado;
 
