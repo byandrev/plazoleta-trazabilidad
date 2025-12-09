@@ -1,20 +1,18 @@
 server:
-  port: 8082
+  port: 8083
 
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5433/plazoleta-restaurantes
-    username: root
-    password: 123456
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+  data:
+    mongodb:
+      database: plazoleta-trazabilidad
+      host: localhost
+      port: 27017
+      username: test
+      password: test
 
 jwt:
   secret: 123456
   expiration: 1
 
-appDescription: "Plazoleta Restaurantes"
+appDescription: "Plazoleta Trazabilidad"
 appVersion: "1.0.0"
