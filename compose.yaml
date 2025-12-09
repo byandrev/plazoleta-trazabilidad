@@ -4,7 +4,8 @@ services:
     restart: unless-stopped
     environment:
       - 'MONGO_INITDB_ROOT_USERNAME=test'
-      - 'MONGO_INITDB_ROOT_PASSWORD=test'
+      - 'MONGO_INITDB_ROOT_PASSWORD=202cb962ac59075b964b07152d234b70'
+      - 'MONGO_INITDB_DATABASE=plazoleta-trazabilidad'
     ports:
       - '27017:27017'
     volumes:
