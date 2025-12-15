@@ -3,6 +3,8 @@ package com.pragma.powerup.application.dto.response;
 import com.pragma.powerup.domain.model.EstadoType;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class EstadoPedidoResponseDto {
 
@@ -11,6 +13,8 @@ public class EstadoPedidoResponseDto {
     private Long pedidoId;
 
     private Long clienteId;
+
+    private LocalDateTime fecha;
 
     private String correoCliente;
 
