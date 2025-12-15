@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,6 +20,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EstadoPedidoUseCaseTest {
+
+    private final static Long USER_ID = 1L;
+    private final static Long PEDIDO_ID = 10L;
 
     @Mock
     private IEstadoPedidoPersistencePort estadoPedidoPersistencePort;
@@ -55,7 +59,7 @@ class EstadoPedidoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe crear un estado de pedido exitosamente y establecer la fecha")
+    @DisplayName("save() debe crear un estado de pedido exitosamente y establecer la fecha")
     void save_shouldCreateEstadoPedidoSuccessfully_andSetFecha() {
         when(estadoPedidoPersistencePort.save(any(EstadoPedidoModel.class))).thenReturn(estadoPedidoSaved);
 
@@ -73,7 +77,7 @@ class EstadoPedidoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe establecer la fecha antes de guardar el estado de pedido")
+    @DisplayName("save() debe establecer la fecha antes de guardar el estado de pedido")
     void save_shouldSetFechaBeforeSaving() {
         when(estadoPedidoPersistencePort.save(any(EstadoPedidoModel.class))).thenAnswer(invocation -> {
             EstadoPedidoModel model = invocation.getArgument(0);
@@ -87,7 +91,7 @@ class EstadoPedidoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Debe crear un estado de pedido con todos los campos correctamente")
+    @DisplayName("save() debe crear un estado de pedido con todos los campos correctamente")
     void save_shouldCreateEstadoPedidoWithAllFields() {
         EstadoPedidoModel requestWithAllFields = EstadoPedidoModel.builder()
                 .pedidoId(2L)
@@ -127,6 +131,34 @@ class EstadoPedidoUseCaseTest {
         assertEquals(6L, result.getEmpleadoId());
         assertEquals("empleado2@gmail.com", result.getCorreoEmpleado());
         assertNotNull(result.getFecha());
+    }
+
+    @Test
+    @DisplayName("getAll() debe retornar una lista vacía si no hay resultados")
+    void getAllEstadoPedido_shouldReturnEmptyList() {
+        List<EstadoPedidoModel> emptyMockPage = List.of();
+        when(estadoPedidoPersistencePort.getAll(USER_ID, PEDIDO_ID)).thenReturn(emptyMockPage);
+
+        List<EstadoPedidoModel> result = estadoPedidoUseCase.getAll(USER_ID, PEDIDO_ID);
+
+        assertNotNull(result, "La lista no debe ser null");
+        assertEquals(0, result.size(), "El contenido debe estar vacío");
+
+        verify(estadoPedidoPersistencePort).getAll(USER_ID, PEDIDO_ID);
+    }
+
+    @Test
+    @DisplayName("getAll() debe retornar una lista con los resultados")
+    void getAllEstadoPedido() {
+        List<EstadoPedidoModel> emptyMockPage = List.of(EstadoPedidoModel.builder().build());
+        when(estadoPedidoPersistencePort.getAll(USER_ID, PEDIDO_ID)).thenReturn(emptyMockPage);
+
+        List<EstadoPedidoModel> result = estadoPedidoUseCase.getAll(USER_ID, PEDIDO_ID);
+
+        assertNotNull(result, "La lista no debe ser null");
+        assertEquals(1, result.size(), "El contenido debe estar vacío");
+
+        verify(estadoPedidoPersistencePort).getAll(USER_ID, PEDIDO_ID);
     }
 
 }

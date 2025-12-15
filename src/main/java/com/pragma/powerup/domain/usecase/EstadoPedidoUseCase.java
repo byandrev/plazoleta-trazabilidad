@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,12 @@ public class EstadoPedidoUseCase implements IEstadoPedidoServicePort {
     public EstadoPedidoModel save(EstadoPedidoModel estadoPedido) {
         estadoPedido.setFecha(LocalDateTime.now());
         return estadoPedidoPersistencePort.save(estadoPedido);
+    }
+
+    @Override
+    public List<EstadoPedidoModel> getAll(Long userId, Long pedidoId) {
+        List<EstadoPedidoModel> list = estadoPedidoPersistencePort.getAll(userId, pedidoId);
+        return list;
     }
 
 }
