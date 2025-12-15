@@ -10,6 +10,9 @@ import com.pragma.powerup.domain.model.EstadoPedidoModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class EstadoPedidoHandler implements IEstadoPedidoHandler {
@@ -24,6 +27,12 @@ public class EstadoPedidoHandler implements IEstadoPedidoHandler {
     public EstadoPedidoResponseDto save(EstadoPedidoRequestDto estadoPedidoRequestDto) {
         EstadoPedidoModel estadoCreated = estadoPedidoService.save(RequestMapper.toModel(estadoPedidoRequestDto));
         return responseMapper.toResponse(estadoCreated);
+    }
+
+    @Override
+    public List<EstadoPedidoResponseDto> getAll(Long userId, Long pedidoId) {
+        List<EstadoPedidoModel> list = estadoPedidoService.getAll(userId, pedidoId);
+        return list.stream().map(responseMapper::toResponse).collect(Collectors.toList());
     }
 
 }
