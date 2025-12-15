@@ -1,7 +1,9 @@
 package com.pragma.powerup.application.dto.response;
 
 import com.pragma.powerup.domain.model.EstadoType;
+import lombok.Data;
 
+@Data
 public class EstadoPedidoResponseDto {
 
     private String id;
@@ -15,9 +17,5 @@ public class EstadoPedidoResponseDto {
     private EstadoType estadoAnterior;
 
     private EstadoType estadoNuevo;
-
-    private Long empleadoId;
-
-    private String correoEmpleado;
 
 }
