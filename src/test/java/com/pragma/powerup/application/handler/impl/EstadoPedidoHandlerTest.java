@@ -16,12 +16,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EstadoPedidoHandlerTest {
+
+    private final static Long PEDIDO_ID = 10L;
+    private final Long CLIENTE_ID = 10L;
+    private final Long EMPLEADO_ID = 5L;
 
     @Mock
     private IEstadoPedidoServicePort estadoPedidoService;
@@ -38,10 +43,6 @@ class EstadoPedidoHandlerTest {
     private EstadoPedidoRequestDto estadoPedidoRequestDto;
     private EstadoPedidoModel estadoPedidoModel;
     private EstadoPedidoResponseDto estadoPedidoResponseDto;
-
-    private final Long PEDIDO_ID = 1L;
-    private final Long CLIENTE_ID = 10L;
-    private final Long EMPLEADO_ID = 5L;
 
     @BeforeEach
     void setUp() {
@@ -71,7 +72,7 @@ class EstadoPedidoHandlerTest {
     }
 
     @Test
-    @DisplayName("save debe mapear DTO a Model y llamar al servicio para guardar")
+    @DisplayName("save() debe mapear DTO a Model y llamar al servicio para guardar")
     void save_SuccessfulFlow_CallsMapperAndService() {
         when(requestMapper.toModel(estadoPedidoRequestDto)).thenReturn(estadoPedidoModel);
         when(estadoPedidoService.save(estadoPedidoModel)).thenReturn(estadoPedidoModel);
@@ -89,7 +90,7 @@ class EstadoPedidoHandlerTest {
     }
 
     @Test
-    @DisplayName("save debe propagar excepciones del servicio")
+    @DisplayName("save() debe propagar excepciones del servicio")
     void save_ServiceThrowsException_PropagatesException() {
         when(requestMapper.toModel(estadoPedidoRequestDto)).thenReturn(estadoPedidoModel);
         when(estadoPedidoService.save(estadoPedidoModel)).thenThrow(new RuntimeException("Error al guardar"));
@@ -101,6 +102,23 @@ class EstadoPedidoHandlerTest {
         verify(requestMapper).toModel(estadoPedidoRequestDto);
         verify(estadoPedidoService).save(estadoPedidoModel);
         verify(responseMapper, never()).toResponse(any());
+    }
+
+    @Test
+    @DisplayName("getAll() debe mapear DTO a Model y llamar al servicio para listar")
+    void getAll_SuccessfulFlow_CallsMapperAndService() {
+        EstadoPedidoModel pedidoModel = EstadoPedidoModel.builder().build();
+        List<EstadoPedidoModel> mockList = List.of(EstadoPedidoModel.builder().build());
+        when(estadoPedidoService.getAll(CLIENTE_ID, PEDIDO_ID)).thenReturn(mockList);
+        when(responseMapper.toResponse(pedidoModel)).thenReturn(estadoPedidoResponseDto);
+
+        List<EstadoPedidoResponseDto> result = estadoPedidoHandler.getAll(CLIENTE_ID, PEDIDO_ID);
+
+        verify(estadoPedidoService).getAll(CLIENTE_ID, PEDIDO_ID);
+        verify(responseMapper).toResponse(pedidoModel);
+        verifyNoMoreInteractions(estadoPedidoService, requestMapper, responseMapper);
+
+        assertNotNull(result);
     }
 
 }
