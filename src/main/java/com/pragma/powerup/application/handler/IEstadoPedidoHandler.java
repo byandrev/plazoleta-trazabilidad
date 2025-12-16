@@ -15,6 +15,8 @@ public interface IEstadoPedidoHandler {
 
     List<EstadoPedidoResponseDto> getAll(Long userId, Long pedidoId);
 
-    PaginationResponseDto<PedidoTimeResponseDto> getTimePedidos(PaginationRequestDto pagination);
+    PaginationResponseDto<PedidoTimeResponseDto> getTimePedidos(Long restauranteId, PaginationRequestDto pagination);
+
+    PedidoTimeResponseDto getTimePedido(Long pedidoId);
 
 }

@@ -41,10 +41,15 @@ public class EstadoPedidoHandler implements IEstadoPedidoHandler {
     }
 
     @Override
-    public PaginationResponseDto<PedidoTimeResponseDto> getTimePedidos(PaginationRequestDto pagination) {
-        PaginationResult<PedidoTimeModel> times = estadoPedidoService.getTimePedidos(paginationRequestMapper.toModel(pagination));
+    public PaginationResponseDto<PedidoTimeResponseDto> getTimePedidos(Long restauranteId, PaginationRequestDto pagination) {
+        PaginationResult<PedidoTimeModel> times = estadoPedidoService.getTimePedidos(restauranteId, paginationRequestMapper.toModel(pagination));
         PaginationResult<PedidoTimeResponseDto> result = times.map(timeResponseDtoMapper::toResponse);
         return paginationResponseMapper.toResponse(result);
+    }
+
+    @Override
+    public PedidoTimeResponseDto getTimePedido(Long pedidoId) {
+        return timeResponseDtoMapper.toResponse(estadoPedidoService.getTimePedido(pedidoId));
     }
 
 }
