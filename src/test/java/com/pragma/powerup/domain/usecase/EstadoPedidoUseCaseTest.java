@@ -1,7 +1,6 @@
 package com.pragma.powerup.domain.usecase;
 
-import com.pragma.powerup.domain.model.EstadoPedidoModel;
-import com.pragma.powerup.domain.model.EstadoType;
+import com.pragma.powerup.domain.model.*;
 import com.pragma.powerup.domain.spi.IEstadoPedidoPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +23,7 @@ class EstadoPedidoUseCaseTest {
 
     private final static Long USER_ID = 1L;
     private final static Long PEDIDO_ID = 10L;
+    private final static Long RESTAURANTE_ID = 5L;
 
     @Mock
     private IEstadoPedidoPersistencePort estadoPedidoPersistencePort;
@@ -32,6 +33,8 @@ class EstadoPedidoUseCaseTest {
 
     private EstadoPedidoModel estadoPedidoRequest;
     private EstadoPedidoModel estadoPedidoSaved;
+    private PaginationInfo paginationInfo;
+    private PaginationResult<PedidoTimeModel> expectedPaginationResult;
 
     @BeforeEach
     void setUp() {
@@ -56,6 +59,14 @@ class EstadoPedidoUseCaseTest {
                 .empleadoId(5L)
                 .correoEmpleado("empleado@gmail.com")
                 .build();
+
+        paginationInfo = PaginationInfo.builder().page(1).size(20).build();
+
+        expectedPaginationResult = new PaginationResult<>(
+                Collections.singletonList(
+                        PedidoTimeModel.builder().pedido(101L).tiempo(650000F).build()
+                ), 1, 10, 1
+        );
     }
 
     @Test
@@ -159,6 +170,39 @@ class EstadoPedidoUseCaseTest {
         assertEquals(1, result.size(), "El contenido debe estar vacío");
 
         verify(estadoPedidoPersistencePort).getAll(USER_ID, PEDIDO_ID);
+    }
+
+    @Test
+    @DisplayName("getTimePedidos() debe llamar al puerto de persistencia y retornar su resultado")
+    void getTimePedidos_ShouldDelegateToPersistencePortAndReturnResult() {
+        when(estadoPedidoPersistencePort.getTimePedidos(eq(RESTAURANTE_ID), eq(paginationInfo)))
+                .thenReturn(expectedPaginationResult);
+
+        PaginationResult<PedidoTimeModel> result = estadoPedidoUseCase.getTimePedidos(RESTAURANTE_ID, paginationInfo);
+
+        assertNotNull(result, "El resultado no debe ser nulo.");
+        assertEquals(expectedPaginationResult, result, "El resultado retornado debe ser exactamente el mismo que el del puerto.");
+
+        verify(estadoPedidoPersistencePort).getTimePedidos(RESTAURANTE_ID, paginationInfo);
+        verifyNoMoreInteractions(estadoPedidoPersistencePort);
+    }
+
+    @Test
+    @DisplayName("getTimePedidos() debe manejar correctamente una lista vacía retornada por el puerto")
+    void getTimePedidos_ShouldHandleEmptyResultFromPersistencePort() {
+        PaginationResult<PedidoTimeModel> emptyResult = new PaginationResult<PedidoTimeModel>(
+                Collections.emptyList(), 0, 0, 0
+        );
+
+        when(estadoPedidoPersistencePort.getTimePedidos(eq(RESTAURANTE_ID), eq(paginationInfo))).thenReturn(emptyResult);
+
+        PaginationResult<PedidoTimeModel> result = estadoPedidoUseCase.getTimePedidos(RESTAURANTE_ID, paginationInfo);
+
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements(), "El total de elementos debe ser cero.");
+        assertEquals(emptyResult, result, "El resultado retornado debe ser el resultado vacío.");
+
+        verify(estadoPedidoPersistencePort).getTimePedidos(RESTAURANTE_ID, paginationInfo);
     }
 
 }
