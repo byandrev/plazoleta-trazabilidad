@@ -13,6 +13,8 @@ public interface IEstadoPedidoServicePort {
 
     List<EstadoPedidoModel> getAll(Long userId, Long pedidoId);
 
-    PaginationResult<PedidoTimeModel> getTimePedidos(PaginationInfo pagination);
+    PaginationResult<PedidoTimeModel> getTimePedidos(Long restauranteId, PaginationInfo pagination);
+
+    PedidoTimeModel getTimePedido(Long pedidoId);
 
 }
