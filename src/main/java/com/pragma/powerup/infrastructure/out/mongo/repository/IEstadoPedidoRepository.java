@@ -20,7 +20,7 @@ public interface IEstadoPedidoRepository extends MongoRepository<EstadoPedidoEnt
     long countTotalTimeByPedido();
 
     @Aggregation(pipeline = {
-            "{ '$match': { 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
+            "{ '$match': { 'id_restaurante': ?0, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
 
             "{ '$group': { " +
                     "'_id': '$id_pedido', " +
@@ -40,6 +40,26 @@ public interface IEstadoPedidoRepository extends MongoRepository<EstadoPedidoEnt
             "{ '$skip': ?#{#pageable.offset} }",
             "{ '$limit': ?#{#pageable.pageSize} }"
     })
-    List<PedidoTimeModel> getTimeByPedido(Pageable pageable);
+    List<PedidoTimeModel> getTimeByPedidos(Long restauranteId, Pageable pageable);
+
+    @Aggregation(pipeline = {
+            "{ '$match': { 'id_pedido': ?0, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
+
+            "{ '$group': { " +
+                    "'_id': '$id_pedido', " +
+                    "'fechaPreparacion': { '$min': { '$cond': [ { '$eq': ['$estado_nuevo', 'PENDIENTE'] }, '$fecha', null ] } }, " +
+                    "'fechaEntregado': { '$max': { '$cond': [ { '$eq': ['$estado_nuevo', 'ENTREGADO'] }, '$fecha', null ] } }, " +
+                    "'pedido': { '$first': '$id_pedido' } " +
+                    "} }",
+
+            "{ '$project': { " +
+                    "'_id': 0," +
+                    "'fechaInicio': '$fechaPreparacion'," +
+                    "'fechaFin': '$fechaEntregado'," +
+                    "'tiempo': { '$divide': [ { '$subtract': ['$fechaEntregado', '$fechaPreparacion'] }, 1000 ] }," +
+                    "'pedido': '$pedido'," +
+                    "} }"
+    })
+    PedidoTimeModel getTimeByPedidoId(Long pedidoId);
 
 }
