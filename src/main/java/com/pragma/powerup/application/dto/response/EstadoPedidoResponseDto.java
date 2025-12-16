@@ -12,6 +12,8 @@ public class EstadoPedidoResponseDto {
 
     private Long pedidoId;
 
+    private Long restaurantId;
+
     private Long clienteId;
 
     private LocalDateTime fecha;
