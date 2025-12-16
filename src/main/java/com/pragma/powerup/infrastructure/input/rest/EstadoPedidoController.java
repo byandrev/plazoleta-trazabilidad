@@ -80,21 +80,4 @@ public class EstadoPedidoController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get tiempos de pedido por ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tiempos de pedido")
-    })
-    @PreAuthorize("hasRole('PROPIETARIO')")
-    @GetMapping("/pedidos/{pedidoId}")
-    public ResponseEntity<CustomResponse<PedidoTimeResponseDto>> getTimePedidoId(
-            @PathVariable Long pedidoId
-    ) {
-        CustomResponse<PedidoTimeResponseDto> response = CustomResponse.<PedidoTimeResponseDto>builder()
-                .status(HttpStatus.OK.value())
-                .data(estadoPedidoHandler.getTimePedido(pedidoId))
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
 }

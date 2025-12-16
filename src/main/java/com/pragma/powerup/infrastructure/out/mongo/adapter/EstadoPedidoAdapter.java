@@ -53,16 +53,5 @@ public class EstadoPedidoAdapter implements IEstadoPedidoPersistencePort {
         return paginationMapper.toModel(page);
     }
 
-    @Override
-    public PedidoTimeModel getTimePedido(Long pedidoId) {
-        PedidoTimeModel pedido = repository.getTimeByPedidoId(pedidoId);
-
-        if (pedido == null) {
-            throw new ResourceNotFound("El pedido " + pedidoId +" no existe");
-        }
-
-        return pedido;
-    }
-
 }
 

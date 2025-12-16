@@ -47,9 +47,4 @@ public class EstadoPedidoHandler implements IEstadoPedidoHandler {
         return paginationResponseMapper.toResponse(result);
     }
 
-    @Override
-    public PedidoTimeResponseDto getTimePedido(Long pedidoId) {
-        return timeResponseDtoMapper.toResponse(estadoPedidoService.getTimePedido(pedidoId));
-    }
-
 }

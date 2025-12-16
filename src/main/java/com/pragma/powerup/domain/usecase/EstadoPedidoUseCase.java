@@ -35,9 +35,4 @@ public class EstadoPedidoUseCase implements IEstadoPedidoServicePort {
         return estadoPedidoPersistencePort.getTimePedidos(restauranteId, pagination);
     }
 
-    @Override
-    public PedidoTimeModel getTimePedido(Long pedidoId) {
-        return estadoPedidoPersistencePort.getTimePedido(pedidoId);
-    }
-
 }

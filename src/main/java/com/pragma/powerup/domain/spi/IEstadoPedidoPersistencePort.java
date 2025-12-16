@@ -15,6 +15,4 @@ public interface IEstadoPedidoPersistencePort {
 
     PaginationResult<PedidoTimeModel> getTimePedidos(Long restauranteId, PaginationInfo pagination);
 
-    PedidoTimeModel getTimePedido(Long pedidoId);
-
 }
