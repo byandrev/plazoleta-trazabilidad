@@ -45,12 +45,24 @@ public class EstadoPedidoAdapter implements IEstadoPedidoPersistencePort {
     }
 
     @Override
-    public PaginationResult<PedidoTimeModel> getTimePedidos(PaginationInfo pagination) {
+    public PaginationResult<PedidoTimeModel> getTimePedidos(Long restauranteId, PaginationInfo pagination) {
         Pageable pageable = paginationMapper.toPageable(pagination);
-        List<PedidoTimeModel> content = repository.getTimeByPedido(pageable);
+        List<PedidoTimeModel> content = repository.getTimeByPedidos(restauranteId, pageable);
         long total = repository.countTotalTimeByPedido();
         Page<PedidoTimeModel> page = new PageImpl<>(content, pageable, total);
         return paginationMapper.toModel(page);
     }
 
+    @Override
+    public PedidoTimeModel getTimePedido(Long pedidoId) {
+        PedidoTimeModel pedido = repository.getTimeByPedidoId(pedidoId);
+
+        if (pedido == null) {
+            throw new ResourceNotFound("El pedido " + pedidoId +" no existe");
+        }
+
+        return pedido;
+    }
+
 }
+
