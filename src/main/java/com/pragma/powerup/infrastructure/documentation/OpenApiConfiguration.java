@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfiguration {
 
     static final String SECURITY_SCHEMA_NAME = "Bearer Authentication";
+    static final String SERVICE_SECRET_SCHEME = "ServiceSecretAuth";
+    static final String SERVICE_SECRET_HEADER = "X-Service-Secret";
 
     @Bean
     public OpenAPI customOpenApi(@Value("${appdescription}") String appDescription,
@@ -22,13 +24,20 @@ public class OpenApiConfiguration {
             .components(new Components()
                     .addSecuritySchemes(SECURITY_SCHEMA_NAME,
                             new SecurityScheme()
-                            .name(SECURITY_SCHEMA_NAME)
-                            .type(SecurityScheme.Type.HTTP)
-                            .scheme("bearer")
-                            .bearerFormat("JWT")
-                            .in(SecurityScheme.In.HEADER)
+                                .name(SECURITY_SCHEMA_NAME)
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .in(SecurityScheme.In.HEADER)
+                    )
+                    .addSecuritySchemes(SERVICE_SECRET_SCHEME,
+                            new SecurityScheme()
+                                .name(SERVICE_SECRET_HEADER)
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.HEADER)
                     )
             )
+                .addSecurityItem(new SecurityRequirement().addList(SERVICE_SECRET_SCHEME))
                 .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEMA_NAME))
             .info(new Info()
                 .title("Plazoleta Trazabilidad")
