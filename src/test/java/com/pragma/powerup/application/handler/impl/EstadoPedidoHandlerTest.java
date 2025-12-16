@@ -1,12 +1,13 @@
 package com.pragma.powerup.application.handler.impl;
 
 import com.pragma.powerup.application.dto.request.EstadoPedidoRequestDto;
+import com.pragma.powerup.application.dto.request.PaginationRequestDto;
 import com.pragma.powerup.application.dto.response.EstadoPedidoResponseDto;
-import com.pragma.powerup.application.mapper.IEstadoPedidoRequestDtoMapper;
-import com.pragma.powerup.application.mapper.IEstadoPedidoResponseDtoMapper;
+import com.pragma.powerup.application.dto.response.PaginationResponseDto;
+import com.pragma.powerup.application.dto.response.PedidoTimeResponseDto;
+import com.pragma.powerup.application.mapper.*;
 import com.pragma.powerup.domain.api.IEstadoPedidoServicePort;
-import com.pragma.powerup.domain.model.EstadoPedidoModel;
-import com.pragma.powerup.domain.model.EstadoType;
+import com.pragma.powerup.domain.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,18 +25,23 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class EstadoPedidoHandlerTest {
 
-    private final static Long PEDIDO_ID = 10L;
-    private final Long CLIENTE_ID = 10L;
-    private final Long EMPLEADO_ID = 5L;
+    private static final Long PEDIDO_ID = 10L;
+    private static final Long CLIENTE_ID = 10L;
+    private static final Long EMPLEADO_ID = 5L;
+    private static final Long RESTAURANTE_ID = 5L;
 
     @Mock
     private IEstadoPedidoServicePort estadoPedidoService;
-
     @Mock
     private IEstadoPedidoRequestDtoMapper requestMapper;
-
     @Mock
     private IEstadoPedidoResponseDtoMapper responseMapper;
+    @Mock
+    private IPaginationRequestMapper paginationRequestMapper;
+    @Mock
+    private IPaginationResponseMapper paginationResponseMapper;
+    @Mock
+    private IPedidoTimeResponseDtoMapper timeResponseMapper;
 
     @InjectMocks
     private EstadoPedidoHandler estadoPedidoHandler;
@@ -119,6 +125,33 @@ class EstadoPedidoHandlerTest {
         verifyNoMoreInteractions(estadoPedidoService, requestMapper, responseMapper);
 
         assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("getTimePedidos() debe mapear paginación y llamar al servicio")
+    void getTimePedidos_SuccessfulFlow_CallsMapperAndService() {
+        PaginationRequestDto paginationRequestDto = PaginationRequestDto.builder().page(0).size(10).build();
+        PaginationInfo paginationModel = PaginationInfo.builder().page(0).size(10).build();
+        PedidoTimeModel pedidoTimeModel = PedidoTimeModel.builder().pedido(PEDIDO_ID).tiempo(30F).build();
+        PedidoTimeResponseDto pedidoTimeResponseDto = PedidoTimeResponseDto.builder().pedido(PEDIDO_ID).tiempo(30F).build();
+        PaginationResult<PedidoTimeModel> paginationResult = new PaginationResult<>(List.of(pedidoTimeModel), 1, 0, 10);
+
+        when(paginationRequestMapper.toModel(paginationRequestDto)).thenReturn(paginationModel);
+        when(estadoPedidoService.getTimePedidos(RESTAURANTE_ID, paginationModel)).thenReturn(paginationResult);
+        when(timeResponseMapper.toResponse(pedidoTimeModel)).thenReturn(pedidoTimeResponseDto);
+        when(paginationResponseMapper.toResponse(any(PaginationResult.class))).thenReturn(
+                new PaginationResponseDto<>(List.of(pedidoTimeResponseDto), 1, 0, 10)
+        );
+
+        PaginationResponseDto<PedidoTimeResponseDto> result = estadoPedidoHandler.getTimePedidos(RESTAURANTE_ID, paginationRequestDto);
+
+        verify(paginationRequestMapper).toModel(paginationRequestDto);
+        verify(estadoPedidoService).getTimePedidos(RESTAURANTE_ID, paginationModel);
+        verify(timeResponseMapper).toResponse(pedidoTimeModel);
+        verify(paginationResponseMapper).toResponse(any(PaginationResult.class));
+
+        assertNotNull(result);
+        assertFalse(result.getContent().isEmpty());
     }
 
 }
