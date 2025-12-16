@@ -69,11 +69,29 @@ public class EstadoPedidoController {
     @PreAuthorize("hasRole('PROPIETARIO')")
     @GetMapping("/pedidos")
     public ResponseEntity<CustomResponse<PaginationResponseDto<PedidoTimeResponseDto>>> getTimePedidos(
-            @Valid PaginationRequestDto paginationRequest
+            @Valid PaginationRequestDto paginationRequest,
+            @RequestParam Long restauranteId
     ) {
         CustomResponse<PaginationResponseDto<PedidoTimeResponseDto>> response = CustomResponse.<PaginationResponseDto<PedidoTimeResponseDto>>builder()
                 .status(HttpStatus.OK.value())
-                .data(estadoPedidoHandler.getTimePedidos(paginationRequest))
+                .data(estadoPedidoHandler.getTimePedidos(restauranteId, paginationRequest))
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get tiempos de pedido por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tiempos de pedido")
+    })
+    @PreAuthorize("hasRole('PROPIETARIO')")
+    @GetMapping("/pedidos/{pedidoId}")
+    public ResponseEntity<CustomResponse<PedidoTimeResponseDto>> getTimePedidoId(
+            @PathVariable Long pedidoId
+    ) {
+        CustomResponse<PedidoTimeResponseDto> response = CustomResponse.<PedidoTimeResponseDto>builder()
+                .status(HttpStatus.OK.value())
+                .data(estadoPedidoHandler.getTimePedido(pedidoId))
                 .build();
 
         return ResponseEntity.ok(response);
