@@ -1,9 +1,6 @@
 package com.pragma.powerup.infrastructure.out.mongo.adapter;
 
-import com.pragma.powerup.domain.model.EstadoPedidoModel;
-import com.pragma.powerup.domain.model.PaginationInfo;
-import com.pragma.powerup.domain.model.PaginationResult;
-import com.pragma.powerup.domain.model.PedidoTimeModel;
+import com.pragma.powerup.domain.model.*;
 import com.pragma.powerup.domain.spi.IEstadoPedidoPersistencePort;
 import com.pragma.powerup.infrastructure.exception.ResourceNotFound;
 import com.pragma.powerup.infrastructure.out.mongo.entity.EstadoPedidoEntity;
@@ -50,6 +47,15 @@ public class EstadoPedidoAdapter implements IEstadoPedidoPersistencePort {
         List<PedidoTimeModel> content = repository.getTimeByPedidos(restauranteId, pageable);
         long total = repository.countTotalTimeByPedido();
         Page<PedidoTimeModel> page = new PageImpl<>(content, pageable, total);
+        return paginationMapper.toModel(page);
+    }
+
+    @Override
+    public PaginationResult<EmpleadoTiempoModel> getRankingEmpleados(Long restauranteId, PaginationInfo pagination) {
+        Pageable pageable = paginationMapper.toPageable(pagination);
+        List<EmpleadoTiempoModel> content = repository.getRankingTiempoByEmpleado(restauranteId, pageable);
+        long total = repository.countTotalEmpleadosRanking(restauranteId);
+        Page<EmpleadoTiempoModel> page = new PageImpl<>(content, pageable, total);
         return paginationMapper.toModel(page);
     }
 
