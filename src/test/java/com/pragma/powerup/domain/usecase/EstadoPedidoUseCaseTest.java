@@ -205,5 +205,44 @@ class EstadoPedidoUseCaseTest {
         verify(estadoPedidoPersistencePort).getTimePedidos(RESTAURANTE_ID, paginationInfo);
     }
 
+    @Test
+    @DisplayName("getRankingEmpleados() debe llamar al puerto de persistencia y retornar su resultado")
+    void getRankingEmpleados_ShouldDelegateToPersistencePortAndReturnResult() {
+        PaginationResult<EmpleadoTiempoModel> expectedPaginationResult = new PaginationResult<EmpleadoTiempoModel>(
+                Collections.singletonList(
+                        EmpleadoTiempoModel.builder().empleado(101L).tiempoMedioSegundos(650000D).build()
+                ), 1, 10, 1
+        );
+
+        when(estadoPedidoPersistencePort.getRankingEmpleados(eq(RESTAURANTE_ID), eq(paginationInfo)))
+                .thenReturn(expectedPaginationResult);
+
+        PaginationResult<EmpleadoTiempoModel> result = estadoPedidoUseCase.getRankingEmpleados(RESTAURANTE_ID, paginationInfo);
+
+        assertNotNull(result, "El resultado no debe ser nulo.");
+        assertEquals(expectedPaginationResult, result, "El resultado retornado debe ser exactamente el mismo que el del puerto.");
+
+        verify(estadoPedidoPersistencePort).getRankingEmpleados(RESTAURANTE_ID, paginationInfo);
+        verifyNoMoreInteractions(estadoPedidoPersistencePort);
+    }
+
+    @Test
+    @DisplayName("getRankingEmpleados() debe manejar correctamente una lista vacía retornada por el puerto")
+    void getRankingEmpleados_ShouldHandleEmptyResultFromPersistencePort() {
+        PaginationResult<EmpleadoTiempoModel> emptyResult = new PaginationResult<EmpleadoTiempoModel>(
+                Collections.emptyList(), 0, 0, 0
+        );
+
+        when(estadoPedidoPersistencePort.getRankingEmpleados(eq(RESTAURANTE_ID), eq(paginationInfo))).thenReturn(emptyResult);
+
+        PaginationResult<EmpleadoTiempoModel> result = estadoPedidoUseCase.getRankingEmpleados(RESTAURANTE_ID, paginationInfo);
+
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements(), "El total de elementos debe ser cero.");
+        assertEquals(emptyResult, result, "El resultado retornado debe ser el resultado vacío.");
+
+        verify(estadoPedidoPersistencePort).getRankingEmpleados(RESTAURANTE_ID, paginationInfo);
+    }
+
 }
 
