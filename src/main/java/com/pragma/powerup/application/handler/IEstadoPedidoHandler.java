@@ -2,6 +2,7 @@ package com.pragma.powerup.application.handler;
 
 import com.pragma.powerup.application.dto.request.EstadoPedidoRequestDto;
 import com.pragma.powerup.application.dto.request.PaginationRequestDto;
+import com.pragma.powerup.application.dto.response.EmpleadoTiempoResponseDto;
 import com.pragma.powerup.application.dto.response.EstadoPedidoResponseDto;
 import com.pragma.powerup.application.dto.response.PaginationResponseDto;
 import com.pragma.powerup.application.dto.response.PedidoTimeResponseDto;
@@ -15,5 +16,7 @@ public interface IEstadoPedidoHandler {
     List<EstadoPedidoResponseDto> getAll(Long userId, Long pedidoId);
 
     PaginationResponseDto<PedidoTimeResponseDto> getTimePedidos(Long restauranteId, PaginationRequestDto pagination);
+
+    PaginationResponseDto<EmpleadoTiempoResponseDto> getRankingEmpleados(Long restauranteId, PaginationRequestDto pagination);
 
 }
