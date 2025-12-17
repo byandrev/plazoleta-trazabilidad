@@ -14,11 +14,11 @@ public interface IEstadoPedidoRepository extends MongoRepository<EstadoPedidoEnt
     List<EstadoPedidoEntity> findAllByClienteIdAndPedidoId(Long clienteId, Long pedidoId);
 
     @Aggregation(pipeline = {
-            "{ '$match': { 'id_pedido': { '$ne': null }, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
+            "{ '$match': { 'id_restaurante': ?0, 'id_pedido': { '$ne': null }, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
             "{ '$group': { '_id': '$id_pedido' } }",
             "{ '$count': 'total' }"
     })
-    long countTotalTimeByPedido();
+    Long countTotalTimeByPedido(Long restauranteId);
 
     @Aggregation(pipeline = {
             "{ '$match': { 'id_restaurante': ?0, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
