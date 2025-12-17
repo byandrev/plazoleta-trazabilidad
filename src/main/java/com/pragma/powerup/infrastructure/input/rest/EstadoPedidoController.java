@@ -2,6 +2,7 @@ package com.pragma.powerup.infrastructure.input.rest;
 
 import com.pragma.powerup.application.dto.request.EstadoPedidoRequestDto;
 import com.pragma.powerup.application.dto.request.PaginationRequestDto;
+import com.pragma.powerup.application.dto.response.EmpleadoTiempoResponseDto;
 import com.pragma.powerup.application.dto.response.EstadoPedidoResponseDto;
 import com.pragma.powerup.application.dto.response.PaginationResponseDto;
 import com.pragma.powerup.application.dto.response.PedidoTimeResponseDto;
@@ -75,6 +76,24 @@ public class EstadoPedidoController {
         CustomResponse<PaginationResponseDto<PedidoTimeResponseDto>> response = CustomResponse.<PaginationResponseDto<PedidoTimeResponseDto>>builder()
                 .status(HttpStatus.OK.value())
                 .data(estadoPedidoHandler.getTimePedidos(restauranteId, paginationRequest))
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get tiempos de empleados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de tiempos de empleados")
+    })
+    @PreAuthorize("hasRole('PROPIETARIO')")
+    @GetMapping("/empleados")
+    public ResponseEntity<CustomResponse<PaginationResponseDto<EmpleadoTiempoResponseDto>>> getTimeEmpleados(
+            @Valid PaginationRequestDto paginationRequest,
+            @RequestParam Long restauranteId
+    ) {
+        CustomResponse<PaginationResponseDto<EmpleadoTiempoResponseDto>> response = CustomResponse.<PaginationResponseDto<EmpleadoTiempoResponseDto>>builder()
+                .status(HttpStatus.OK.value())
+                .data(estadoPedidoHandler.getRankingEmpleados(restauranteId, paginationRequest))
                 .build();
 
         return ResponseEntity.ok(response);
