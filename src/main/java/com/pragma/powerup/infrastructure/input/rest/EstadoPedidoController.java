@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/trazabilidad")
 @RequiredArgsConstructor
+@Tag(name = "Trazabilidad de Pedidos", description = "Endpoints para el seguimiento de estados")
 public class EstadoPedidoController {
 
     private final IEstadoPedidoHandler estadoPedidoHandler;
 
-    @Operation(summary = "Add new traceability")
+    @Operation(
+            summary = "Registrar un cambio de estado",
+            description = "Guarda un nuevo registro en el historial de trazabilidad de un pedido"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Traceability created", content = @Content)
+            @ApiResponse(responseCode = "201", description = "Registro de trazabilidad creado exitosamente", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Datos de trazabilidad inválidos", content = @Content)
     })
     @PostMapping("/")
     public ResponseEntity<Void> save(
@@ -43,13 +49,18 @@ public class EstadoPedidoController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Get traceability")
+    @Operation(
+            summary = "Consultar línea de tiempo de un pedido",
+            description = "Permite al cliente ver todos los hitos y estados por los que ha pasado su pedido. **Solo accesible por CLIENTE.**"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Traceability list")
+            @ApiResponse(responseCode = "200", description = "Lista de estados obtenida correctamente"),
+            @ApiResponse(responseCode = "404", description = "No se encontró historial para el ID de pedido proporcionado", content = @Content)
     })
     @PreAuthorize("hasRole('CLIENTE')")
     @GetMapping("/{pedidoId}")
     public ResponseEntity<CustomResponse<List<EstadoPedidoResponseDto>>> getAll(
+            @Parameter(description = "ID del pedido a consultar", example = "1")
             @PathVariable Long pedidoId,
             @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetail userDetails
     ) {
@@ -63,14 +74,18 @@ public class EstadoPedidoController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get tiempos de pedidos")
+    @Operation(
+            summary = "Reporte de eficiencia de pedidos por restaurante",
+            description = "Calcula el tiempo transcurrido entre el inicio y el fin de cada pedido para un restaurante específico. **Solo accesible por PROPIETARIO.**"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de tiempos de pedidos")
+            @ApiResponse(responseCode = "200", description = "Reporte de tiempos generado exitosamente")
     })
     @PreAuthorize("hasRole('PROPIETARIO')")
     @GetMapping("/pedidos")
     public ResponseEntity<CustomResponse<PaginationResponseDto<PedidoTimeResponseDto>>> getTimePedidos(
             @Valid PaginationRequestDto paginationRequest,
+            @Parameter(description = "ID del restaurante para filtrar", example = "1")
             @RequestParam Long restauranteId
     ) {
         CustomResponse<PaginationResponseDto<PedidoTimeResponseDto>> response = CustomResponse.<PaginationResponseDto<PedidoTimeResponseDto>>builder()
@@ -81,14 +96,18 @@ public class EstadoPedidoController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get tiempos de empleados")
+    @Operation(
+            summary = "Ranking de empleados (Tiempo promedio)",
+            description = "Muestra el promedio de tiempo de entrega de cada empleado del restaurante. **Solo accesible por PROPIETARIO.**"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de tiempos de empleados")
+            @ApiResponse(responseCode = "200", description = "Ranking de empleados obtenido exitosamente")
     })
     @PreAuthorize("hasRole('PROPIETARIO')")
     @GetMapping("/empleados")
     public ResponseEntity<CustomResponse<PaginationResponseDto<EmpleadoTiempoResponseDto>>> getTimeEmpleados(
             @Valid PaginationRequestDto paginationRequest,
+            @Parameter(description = "ID del restaurante", example = "1")
             @RequestParam Long restauranteId
     ) {
         CustomResponse<PaginationResponseDto<EmpleadoTiempoResponseDto>> response = CustomResponse.<PaginationResponseDto<EmpleadoTiempoResponseDto>>builder()
