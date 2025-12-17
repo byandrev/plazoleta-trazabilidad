@@ -45,32 +45,48 @@ public interface IEstadoPedidoRepository extends MongoRepository<EstadoPedidoEnt
 
     @Aggregation(pipeline = {
             "{ '$match': { 'id_restaurante': ?0, 'id_pedido': { '$ne': null }, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
-            "{ '$group': { '_id': '$id_pedido' } }",
-            "{ '$project': { '_id': 0, 'idEmpleado': '$id_empleado' } }",
-            "{ '$group': { '_id': '$idEmpleado' } }",
+            "{ '$group': { " +
+                    "'_id': '$id_pedido', " +
+                    "'empleado': { '$max': '$id_empleado' } " +
+                    "} }",
+            "{ '$match': { 'empleado': { '$ne': 0 } } }",
+            "{ '$group': { '_id': '$empleado' } }",
             "{ '$count': 'total' }"
     })
-    long countTotalEmpleadosRanking(Long restauranteId);
+    Long countTotalEmpleadosRanking(Long restauranteId);
 
     @Aggregation(pipeline = {
             "{ '$match': { 'id_restaurante': ?0, 'id_pedido': { '$ne': null }, 'estado_nuevo': { '$in': ['PENDIENTE', 'ENTREGADO'] } } }",
 
             "{ '$group': { " +
                     "'_id': '$id_pedido', " +
-                    "'empleado': { '$last': '$id_empleado' }, " +
+                    "'empleado': { '$max': '$id_empleado' }, " +
                     "'fechaInicio': { '$min': { '$cond': [ { '$eq': ['$estado_nuevo', 'PENDIENTE'] }, '$fecha', null ] } }, " +
                     "'fechaFin': { '$max': { '$cond': [ { '$eq': ['$estado_nuevo', 'ENTREGADO'] }, '$fecha', null ] } }, " +
                     "} }",
 
+            "{ '$match': { 'empleado': { '$ne': 0 } } }",
+
+            "{ '$project': { " +
+                    "'empleado': '$empleado', " +
+                    "'duracionMs': { " +
+                        "'$cond': [ " +
+                            "{ '$and': [ { '$ne': ['$fechaFin', null] }, { '$ne': ['$fechaInicio', null] } ] }, " +
+                            "{ '$subtract': ['$fechaFin', '$fechaInicio'] }, " +
+                            "null " +
+                        "] " +
+                    "} " +
+                    "} }",
+
             "{ '$group': { " +
                     "'_id': '$empleado', " +
-                    "'tiempoMedioSegundos': { '$avg': { '$divide': [{ '$subtract': ['$fechaFin', '$fechaInicio'] }, 1000] } } " +
+                    "'promedioMs': { '$avg': '$duracionMs' } " +
                     "} }",
 
             "{ '$project': { " +
                     "'_id': 0," +
                     "'empleado': '$_id'," +
-                    "'tiempoMedioSegundos': '$tiempoMedioSegundos' " +
+                    "'tiempoMedioSegundos': { '$divide': [ { '$ifNull': ['$promedioMs', 0] }, 1000 ] } " +
                     "} }",
 
             "{ '$sort': { 'tiempoMedioSegundos': 1 } }",
