@@ -2,6 +2,7 @@ package com.pragma.powerup.application.handler.impl;
 
 import com.pragma.powerup.application.dto.request.EstadoPedidoRequestDto;
 import com.pragma.powerup.application.dto.request.PaginationRequestDto;
+import com.pragma.powerup.application.dto.response.EmpleadoTiempoResponseDto;
 import com.pragma.powerup.application.dto.response.EstadoPedidoResponseDto;
 import com.pragma.powerup.application.dto.response.PaginationResponseDto;
 import com.pragma.powerup.application.dto.response.PedidoTimeResponseDto;
@@ -42,6 +43,8 @@ class EstadoPedidoHandlerTest {
     private IPaginationResponseMapper paginationResponseMapper;
     @Mock
     private IPedidoTimeResponseDtoMapper timeResponseMapper;
+    @Mock
+    private IEmpleadoTiempoResponseMapper empleadoTiempoResponseMapper;
 
     @InjectMocks
     private EstadoPedidoHandler estadoPedidoHandler;
@@ -148,6 +151,33 @@ class EstadoPedidoHandlerTest {
         verify(paginationRequestMapper).toModel(paginationRequestDto);
         verify(estadoPedidoService).getTimePedidos(RESTAURANTE_ID, paginationModel);
         verify(timeResponseMapper).toResponse(pedidoTimeModel);
+        verify(paginationResponseMapper).toResponse(any(PaginationResult.class));
+
+        assertNotNull(result);
+        assertFalse(result.getContent().isEmpty());
+    }
+
+    @Test
+    @DisplayName("getRankingEmpleados() debe mapear paginación y llamar al servicio")
+    void getRankingEmpleados_SuccessfulFlow_CallsMapperAndService() {
+        PaginationRequestDto paginationRequestDto = PaginationRequestDto.builder().page(0).size(10).build();
+        PaginationInfo paginationModel = PaginationInfo.builder().page(0).size(10).build();
+        EmpleadoTiempoModel empleadoTiempoModel = EmpleadoTiempoModel.builder().empleado(EMPLEADO_ID).tiempoMedioSegundos(30D).build();
+        EmpleadoTiempoResponseDto empleadoTiempoResponseDto = EmpleadoTiempoResponseDto.builder().empleado(EMPLEADO_ID).tiempoMedioSegundos(30D).build();
+        PaginationResult<EmpleadoTiempoModel> paginationResult = new PaginationResult<>(List.of(empleadoTiempoModel), 1, 0, 10);
+
+        when(paginationRequestMapper.toModel(paginationRequestDto)).thenReturn(paginationModel);
+        when(estadoPedidoService.getRankingEmpleados(RESTAURANTE_ID, paginationModel)).thenReturn(paginationResult);
+        when(empleadoTiempoResponseMapper.toResponse(empleadoTiempoModel)).thenReturn(empleadoTiempoResponseDto);
+        when(paginationResponseMapper.toResponse(any(PaginationResult.class))).thenReturn(
+                new PaginationResponseDto<>(List.of(empleadoTiempoResponseDto), 1, 0, 10)
+        );
+
+        PaginationResponseDto<EmpleadoTiempoResponseDto> result = estadoPedidoHandler.getRankingEmpleados(RESTAURANTE_ID, paginationRequestDto);
+
+        verify(paginationRequestMapper).toModel(paginationRequestDto);
+        verify(estadoPedidoService).getRankingEmpleados(RESTAURANTE_ID, paginationModel);
+        verify(empleadoTiempoResponseMapper).toResponse(empleadoTiempoModel);
         verify(paginationResponseMapper).toResponse(any(PaginationResult.class));
 
         assertNotNull(result);
