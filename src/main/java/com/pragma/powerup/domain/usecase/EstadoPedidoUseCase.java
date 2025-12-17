@@ -1,10 +1,7 @@
 package com.pragma.powerup.domain.usecase;
 
 import com.pragma.powerup.domain.api.IEstadoPedidoServicePort;
-import com.pragma.powerup.domain.model.EstadoPedidoModel;
-import com.pragma.powerup.domain.model.PaginationInfo;
-import com.pragma.powerup.domain.model.PaginationResult;
-import com.pragma.powerup.domain.model.PedidoTimeModel;
+import com.pragma.powerup.domain.model.*;
 import com.pragma.powerup.domain.spi.IEstadoPedidoPersistencePort;
 import com.pragma.powerup.domain.utils.ConvertDate;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +30,11 @@ public class EstadoPedidoUseCase implements IEstadoPedidoServicePort {
     @Override
     public PaginationResult<PedidoTimeModel> getTimePedidos(Long restauranteId, PaginationInfo pagination) {
         return estadoPedidoPersistencePort.getTimePedidos(restauranteId, pagination);
+    }
+
+    @Override
+    public PaginationResult<EmpleadoTiempoModel> getRankingEmpleados(Long restauranteId, PaginationInfo pagination) {
+        return estadoPedidoPersistencePort.getRankingEmpleados(restauranteId, pagination);
     }
 
 }
