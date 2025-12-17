@@ -45,12 +45,8 @@ public class EstadoPedidoAdapter implements IEstadoPedidoPersistencePort {
     public PaginationResult<PedidoTimeModel> getTimePedidos(Long restauranteId, PaginationInfo pagination) {
         Pageable pageable = paginationMapper.toPageable(pagination);
         List<PedidoTimeModel> content = repository.getTimeByPedidos(restauranteId, pageable);
-
-        if (content == null || content.isEmpty()) {
-            throw new ResourceNotFound("No hay resultados del restaurante " + restauranteId);
-        }
-
-        long total = repository.countTotalTimeByPedido();
+        Long totalCount = repository.countTotalTimeByPedido(restauranteId);
+        long total = (totalCount != null) ? totalCount : 0L;
         Page<PedidoTimeModel> page = new PageImpl<>(content, pageable, total);
         return paginationMapper.toModel(page);
     }
@@ -59,12 +55,8 @@ public class EstadoPedidoAdapter implements IEstadoPedidoPersistencePort {
     public PaginationResult<EmpleadoTiempoModel> getRankingEmpleados(Long restauranteId, PaginationInfo pagination) {
         Pageable pageable = paginationMapper.toPageable(pagination);
         List<EmpleadoTiempoModel> content = repository.getRankingTiempoByEmpleado(restauranteId, pageable);
-
-        if (content == null || content.isEmpty()) {
-            throw new ResourceNotFound("No hay resultados del restaurante " + restauranteId);
-        }
-
-        long total = repository.countTotalEmpleadosRanking(restauranteId);
+        Long totalCount = repository.countTotalEmpleadosRanking(restauranteId);
+        long total = (totalCount != null) ? totalCount : 0L;
         Page<EmpleadoTiempoModel> page = new PageImpl<>(content, pageable, total);
         return paginationMapper.toModel(page);
     }
