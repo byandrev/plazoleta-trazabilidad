@@ -18,6 +18,9 @@ public class EstadoPedidoRequestDto {
     @NotNull(message = "Es necesario el clienteId")
     private Long clienteId;
 
+    @NotNull(message = "Es necesario el restaurantId")
+    private Long restaurantId;
+
     @NotBlank(message = "El correoCliente no puede estar vacio")
     @Email(message = "El correo del cliente es inválido")
     private String correoCliente;

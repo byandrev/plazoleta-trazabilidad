@@ -18,6 +18,9 @@ public class EstadoPedidoEntity {
     @Field("id_pedido")
     private Long pedidoId;
 
+    @Field("id_restaurante")
+    private Long restaurantId;
+
     @Field("id_cliente")
     private Long clienteId;
 
