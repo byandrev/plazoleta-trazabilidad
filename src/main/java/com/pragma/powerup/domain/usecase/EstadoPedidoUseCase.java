@@ -5,11 +5,9 @@ import com.pragma.powerup.domain.model.*;
 import com.pragma.powerup.domain.spi.IEstadoPedidoPersistencePort;
 import com.pragma.powerup.domain.utils.ConvertDate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
 public class EstadoPedidoUseCase implements IEstadoPedidoServicePort {
 

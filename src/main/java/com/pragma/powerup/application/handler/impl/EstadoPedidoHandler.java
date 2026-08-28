@@ -14,12 +14,10 @@ import com.pragma.powerup.domain.model.EstadoPedidoModel;
 import com.pragma.powerup.domain.model.PaginationResult;
 import com.pragma.powerup.domain.model.PedidoTimeModel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
 public class EstadoPedidoHandler implements IEstadoPedidoHandler {
 
