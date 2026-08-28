@@ -31,6 +31,7 @@ class EstadoPedidoRequestDtoValidationTest {
         return EstadoPedidoRequestDto.builder()
                 .pedidoId(1L)
                 .clienteId(10L)
+                .restaurantId(1L)
                 .correoCliente("test@gmail.com")
                 .estadoAnterior(EstadoType.PENDIENTE)
                 .estadoNuevo(EstadoType.EN_PREPARACION)
